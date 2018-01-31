@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://yutailai.github.io/2018/01/18/hello-world/</loc>
+    
+    <lastmod>2018-01-31T08:34:43.629Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://yutailai.github.io/about/index.html</loc>
     
     <lastmod>2018-01-21T07:39:57.371Z</lastmod>
@@ -19,13 +26,6 @@
     <loc>http://yutailai.github.io/categories/index.html</loc>
     
     <lastmod>2018-01-21T07:39:25.186Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>http://yutailai.github.io/2018/01/18/hello-world/</loc>
-    
-    <lastmod>2018-01-21T03:14:59.155Z</lastmod>
     
   </url>
   
