@@ -5028,9 +5028,9 @@
             }
             ,
             y.templateSettings = {
-                evaluate: /<%([\s\s]+?)%>/g,
-                interpolate: /<%=([\s\s]+?)%>/g,
-                escape: /<%-([\s\s]+?)%>/g
+                evaluate: /<%([\s\S]+?)%>/g,
+                interpolate: /<%=([\s\S]+?)%>/g,
+                escape: /<%-([\s\S]+?)%>/g
             };
             var M = /(.)^/
               , F = {
