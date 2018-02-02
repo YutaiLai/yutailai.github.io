@@ -3,7 +3,7 @@
   <entry>
     <title><![CDATA[使用 aspnet_regiis.exe 加解密 web.config 內容]]></title>
     <url>%2F2018%2F02%2F01%2F%E4%BD%BF%E7%94%A8%20aspnet_regiis.exe%20%E5%8A%A0%E8%A7%A3%E5%AF%86%20web.config%20%E5%85%A7%E5%AE%B9%2F</url>
-    <content type="text"><![CDATA[test]]></content>
+    <content type="text"><![CDATA[aspnet_regiis.exe 主要用途是用來註冊 IIS 上的 ASP.NET 應用程式，像是： 註冊 -i 移除 -u .NET Framework ASP.NET 安裝 建立 ASP.NET 應用程式集區 列出目前已安裝的 ASP.NET 版本 -lv 除了這些以外，還能將組態設定 Web.config 指定區段加解密。]]></content>
       <categories>
         <category>.NET</category>
       </categories>
