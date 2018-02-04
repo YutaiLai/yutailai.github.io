@@ -1,110 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
-<search> 
-  
-    
-    <entry>
-      <title><![CDATA[使用 aspnet_regiis.exe 加解密 web.config 內容]]></title>
-      <url>/2018/02/01/%E4%BD%BF%E7%94%A8%20aspnet_regiis.exe%20%E5%8A%A0%E8%A7%A3%E5%AF%86%20web.config%20%E5%85%A7%E5%AE%B9/</url>
-      <content type="html"><![CDATA[<p><code>aspnet_regiis.exe</code> 主要用途是用來註冊 IIS 上的 ASP.NET 應用程式，像是：</p>
-<ol>
-<li>註冊 <code>-i</code> 移除 <code>-u</code> .NET Framework ASP.NET 安裝</li>
-<li>建立 ASP.NET 應用程式集區</li>
-<li>列出目前已安裝的 ASP.NET 版本 <code>-lv</code></li>
-</ol>
-<p>除了這些以外，還能將組態設定 <code>web.config</code> 指定區段加解密。<br><a id="more"></a></p>
-<hr>
-<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>在 .NET 開發過程中，像是 Web Site、WebAPI 在建立專案時，即會一併產生 <code>web.config</code> 檔案，而 WinForm、Class Library … 等其他專案也會有 <code>App.config</code> 這種 XML 檔案類型的組態設定檔，提供程式開發人員可進一步設定網站伺服器、應用程式或個別網頁。<br>組態設定檔內容難免也會包含了敏感機密資料，較常被提及的像是與資料庫連線所需要設定的連線字串 <code>connectionStrings</code> 即是，由於連線字串包含了伺服器名稱、使用者名稱、密碼等資訊，若不經加密處理而直接以明文方式儲存於組態設定檔，等於將該伺服器的存取權限直接暴露在外，若使用 Fortify SCA 針對程式碼進行弱點掃描偵測，也會被列出 High 高風險項目如下：</p>
-<ul>
-<li><a href="https://vulncat.fortify.com/zh-tw/detail?id=desc.semantic.java.password_management_hardcoded_password#C%23%2FVB.NET%2FASP.NET" target="_blank" rel="noopener">Password Management: Hardcoded Password</a></li>
-<li><a href="https%3A%2F%2Fvulncat.fortify.com%2Fzh-tw%2Fdetail%3Fid%3Ddesc.config.java.password_management_password_in_configuration_file%23C%2523%252FVB.NET%252FASP.NET">Password Management: Password in Configuration File</a></li>
-<li><a href="https%3A%2F%2Fvulncat.hpefod.com%2Fzh-tw%2Fdetail%3Fid%3Ddesc.semantic.dotnet.insecure_transport_database">Insecure Transport: Database</a></li>
-</ul>
-<pre><code class="xml">&lt;!--以明文方式儲存連線字串--&gt;
-&lt;configuration&gt;
-  &lt;connectionStrings&gt;
-    &lt;add name=&quot;connStr&quot; connectionString=&quot;Data Source=.\SQLEXPRESS;Integrated Security=SSPI;Initial Catalog=Northwind;&quot; /&gt;
-   &lt;/connectionStrings&gt;
-&lt;/configuration&gt;
-</code></pre>
-<p>使用 <code>aspnet_regiis.exe</code> 可以針對組態設定選擇使用 <a href="https://zh.wikipedia.org/zh-tw/%E6%95%B0%E6%8D%AE%E4%BF%9D%E6%8A%A4API" target="_blank" rel="noopener">DPAPI (Windows Data Protection API)</a> 或 <a href="https://zh.wikipedia.org/zh-tw/RSA%E5%8A%A0%E5%AF%86%E6%BC%94%E7%AE%97%E6%B3%95" target="_blank" rel="noopener">RSA</a> 進行加密，在  <code>System.Configuration</code> 裡也有提供相對的類別讓我們實作：</p>
-<ul>
-<li>DPAPI：<a href="https%3A%2F%2Fmsdn.microsoft.com%2Fzh-tw%2Flibrary%2Fsystem.configuration.dpapiprotectedconfigurationprovider%28v%3Dvs.100%29.aspx">DpapiProtectedConfigurationProvider</a></li>
-<li>RSA：<a href="https%3A%2F%2Fmsdn.microsoft.com%2Fzh-tw%2Flibrary%2Fsystem.configuration.rsaprotectedconfigurationprovider%28v%3Dvs.100%29.aspx">RsaProtectedConfigurationProvider</a></li>
-</ul>
-<pre><code class="xml">&lt;!--以 RSA 加密後的連線字串--&gt;
-&lt;connectionStrings configProtectionProvider=&quot;RsaProtectedConfigurationProvider&quot;&gt;
-  &lt;EncryptedData Type=&quot;http://www.w3.org/2001/04/xmlenc#Element&quot;
-    xmlns=&quot;http://www.w3.org/2001/04/xmlenc#&quot;&gt;
-    &lt;EncryptionMethod Algorithm=&quot;http://www.w3.org/2001/04/xmlenc#tripledes-cbc&quot; /&gt;
-    &lt;KeyInfo xmlns=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt;
-      &lt;EncryptedKey xmlns=&quot;http://www.w3.org/2001/04/xmlenc#&quot;&gt;
-        &lt;EncryptionMethod Algorithm=&quot;http://www.w3.org/2001/04/xmlenc#rsa-1_5&quot; /&gt;
-        &lt;KeyInfo xmlns=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt;
-          &lt;KeyName&gt;Rsa Key&lt;/KeyName&gt;
-        &lt;/KeyInfo&gt;
-        &lt;CipherData&gt;
-          &lt;CipherValue&gt;Z8g+qVoFeQ2k6np0w0xuyPXgJ3MKYXgnP1ehkIwE8qCXv/5vkynw8WncDSfJFG8tQFWTDv5jUGK6zmjgQssrXI9vFrzlikqn2qZtML6DCkIkOrAFpmrn+eMHsow8tKhT6MugxD8CDQCjRKmNItvEOs+aE52Iy8xpke44D7r2vfVu5utGNuaJz9N5Qhwvj1qdhGxbH4yv8Y+oS3seRydUVu7UxTg8MmauQvJkfeUjEvAUKLhuqs69g03axt7wluglie2E3jEISBKaP1xsldD5etWVleOSgGMGFwSy6GNvAIDbiowO37Nj1x88B2YL/Vg69sRgrqvCw3GauXcQawPHVA==&lt;/CipherValue&gt;
-        &lt;/CipherData&gt;
-      &lt;/EncryptedKey&gt;
-    &lt;/KeyInfo&gt;
-    &lt;CipherData&gt;
-      &lt;CipherValue&gt;QQJja/4XQZ9STW6EdH3YYbUyZoZMq2Y7Wtvm9obju/Hw1vSOf+k2/f+TvebZQxgRid2/95MTMY4ED/s7DzDjNDLvWV7TdtI298Yg6vxiFs1yx+Ln4O71vCfJA0I1wxHVP55d+3EHjWKfclrfCwR1+MLigvv2N5hdaAFMQabmrJKYW1zA+WtXJGmb6uaO4l0w5haDka0FH75b7oY4JOs1E+8tV9rvaOJPBuS4WyPizhKkCuT4cm6M7ywrzDL3sVwebFo68sxtUzmQdjfREQIIrL+IGG58eG6S5aJv5dlYJpahHdLFA8OA80U/mXi5P7TZ6ZBDZ4C4tseGOw6h3MBblKZ7PfvW7OnFvWYleMWIK2CqHwK7lHHhnS+A2TCPdsiKBt0Ad0qR0lIaHGKFC/+xeRaSAWCSekEPstg4ouhImKERbUWAHeCiaIp9kejJ/Zq9zW800lCIXoTiraU9PTpA7KmEvowEYNICRTXwJ43a6GajcGjNZwgfjyCByeJGba2SS+4oawaZ6wgSPL1+21gtYP4nlfuxej4Y2K3BnsOhvs+psk9NgUGNGMcrBOj8LoTq20ar8dRjWh9qQPvdl6fmQFUmQRswpzHQ&lt;/CipherValue&gt;
-    &lt;/CipherData&gt;
-  &lt;/EncryptedData&gt;
-&lt;/connectionStrings&gt;
-</code></pre>
-<h3 id="環境說明"><a href="#環境說明" class="headerlink" title="環境說明"></a>環境說明</h3><h4 id="執行路徑"><a href="#執行路徑" class="headerlink" title="執行路徑"></a>執行路徑</h4><p><code>aspnet_regiis.exe</code> 位於 .NET Framework 安裝目錄中，預設路徑是：</p>
-<ul>
-<li>32位元：%windir%\Microsoft.NET\Framework</li>
-<li>64位元：%windir%\Microsoft.NET\Framework64</li>
-</ul>
-<p>若覺得每次開啟 <code>cmd.exe</code> 再切換到上述目錄而感到不便，也可以直接使用 Visual Studio 的 Developer Command Prompt，開啟後即會將 .NET Framework 所在目錄加到 <code>path</code> 裡；在此也請記得使用 <code>系統管理員</code> 身份執行，以免無法順利成功加密 web.config 組態設定檔。</p>
-<h4 id="使用限制"><a href="#使用限制" class="headerlink" title="使用限制"></a>使用限制</h4><p>一般來說，我們在 <code>web.config</code> 組態設定裡比較常使用下列這些區段，且可進行加密：</p>
-<p>在使用 <code>aspnet_regiis.exe</code> 加密組態設定檔時，無法加密下列區段：</p>
-<ul>
-<li>< processModel ></li>
-<li><code>&lt;runtime&gt;</code></li>
-<li><code>&lt;mscorlib&gt;</code></li>
-<li><code>&lt;startup&gt;</code></li>
-<li><code>&lt;system.runtime.remoting&gt;</code></li>
-<li><code>&lt;configProtectedData&gt;</code></li>
-<li><code>&lt;satelliteassemblies&gt;</code></li>
-<li><code>&lt;cryptographySettings&gt;</code></li>
-<li><code>&lt;cryptoNameMapping&gt;</code></li>
-<li><code>&lt;cryptoClasses&gt;</code></li>
-</ul>
-<p>(未完)</p>
-]]></content>
-      
-        <categories>
-            
-            <category> .NET </category>
-            
-        </categories>
-        
-        
-        <tags>
-            
-            <tag> .NET </tag>
-            
-            <tag> RSA </tag>
-            
-            <tag> encrypt </tag>
-            
-            <tag> decrypt </tag>
-            
-            <tag> connection string </tag>
-            
-            <tag> 加密 </tag>
-            
-            <tag> 解密 </tag>
-            
-            <tag> 連線字串 </tag>
-            
-        </tags>
-        
-    </entry>
-    
-  
-  
+<search>
+  <entry>
+    <title><![CDATA[使用 aspnet_regiis.exe 加解密 web.config 內容]]></title>
+    <url>%2F2018%2F02%2F01%2F%E4%BD%BF%E7%94%A8%20aspnet_regiis.exe%20%E5%8A%A0%E8%A7%A3%E5%AF%86%20web.config%20%E5%85%A7%E5%AE%B9%2F</url>
+    <content type="text"><![CDATA[aspnet_regiis.exe 主要用途是用來註冊 IIS 上的 ASP.NET 應用程式，像是： 註冊 -i 移除 -u .NET Framework ASP.NET 安裝 建立 ASP.NET 應用程式集區 列出目前已安裝的 ASP.NET 版本 -lv 除了這些以外，還能將組態設定 web.config 指定區段加解密。 前言在 .NET 開發過程中，像是 Web Site、WebAPI 在建立專案時，即會一併產生 web.config 檔案，而 WinForm、Class Library … 等其他專案也會有 App.config 這種 XML 檔案類型的組態設定檔，提供程式開發人員可進一步設定網站伺服器、應用程式或個別網頁。組態設定檔內容難免也會包含了敏感機密資料，較常被提及的像是與資料庫連線所需要設定的連線字串 connectionStrings 即是，由於連線字串包含了伺服器名稱、使用者名稱、密碼等資訊，若不經加密處理而直接以明文方式儲存於組態設定檔，等於將該伺服器的存取權限直接暴露在外，若使用 Fortify SCA 針對程式碼進行弱點掃描偵測，也會被列出 High 高風險項目如下： Password Management: Hardcoded Password Password Management: Password in Configuration File Insecure Transport: Database &lt;!--以明文方式儲存連線字串--&gt; &lt;configuration&gt; &lt;connectionStrings&gt; &lt;add name=&quot;connStr&quot; connectionString=&quot;Data Source=.\SQLEXPRESS;Integrated Security=SSPI;Initial Catalog=Northwind;&quot; /&gt; &lt;/connectionStrings&gt; &lt;/configuration&gt; 使用 aspnet_regiis.exe 可以針對組態設定選擇使用 DPAPI (Windows Data Protection API) 或 RSA 進行加密，在 System.Configuration 裡也有提供相對的類別讓我們實作： DPAPI：DpapiProtectedConfigurationProvider RSA：RsaProtectedConfigurationProvider &lt;!--以 RSA 加密後的連線字串--&gt; &lt;connectionStrings configProtectionProvider=&quot;RsaProtectedConfigurationProvider&quot;&gt; &lt;EncryptedData Type=&quot;http://www.w3.org/2001/04/xmlenc#Element&quot; xmlns=&quot;http://www.w3.org/2001/04/xmlenc#&quot;&gt; &lt;EncryptionMethod Algorithm=&quot;http://www.w3.org/2001/04/xmlenc#tripledes-cbc&quot; /&gt; &lt;KeyInfo xmlns=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt; &lt;EncryptedKey xmlns=&quot;http://www.w3.org/2001/04/xmlenc#&quot;&gt; &lt;EncryptionMethod Algorithm=&quot;http://www.w3.org/2001/04/xmlenc#rsa-1_5&quot; /&gt; &lt;KeyInfo xmlns=&quot;http://www.w3.org/2000/09/xmldsig#&quot;&gt; &lt;KeyName&gt;Rsa Key&lt;/KeyName&gt; &lt;/KeyInfo&gt; &lt;CipherData&gt; &lt;CipherValue&gt;Z8g+qVoFeQ2k6np0w0xuyPXgJ3MKYXgnP1ehkIwE8qCXv/5vkynw8WncDSfJFG8tQFWTDv5jUGK6zmjgQssrXI9vFrzlikqn2qZtML6DCkIkOrAFpmrn+eMHsow8tKhT6MugxD8CDQCjRKmNItvEOs+aE52Iy8xpke44D7r2vfVu5utGNuaJz9N5Qhwvj1qdhGxbH4yv8Y+oS3seRydUVu7UxTg8MmauQvJkfeUjEvAUKLhuqs69g03axt7wluglie2E3jEISBKaP1xsldD5etWVleOSgGMGFwSy6GNvAIDbiowO37Nj1x88B2YL/Vg69sRgrqvCw3GauXcQawPHVA==&lt;/CipherValue&gt; &lt;/CipherData&gt; &lt;/EncryptedKey&gt; &lt;/KeyInfo&gt; &lt;CipherData&gt; &lt;CipherValue&gt;QQJja/4XQZ9STW6EdH3YYbUyZoZMq2Y7Wtvm9obju/Hw1vSOf+k2/f+TvebZQxgRid2/95MTMY4ED/s7DzDjNDLvWV7TdtI298Yg6vxiFs1yx+Ln4O71vCfJA0I1wxHVP55d+3EHjWKfclrfCwR1+MLigvv2N5hdaAFMQabmrJKYW1zA+WtXJGmb6uaO4l0w5haDka0FH75b7oY4JOs1E+8tV9rvaOJPBuS4WyPizhKkCuT4cm6M7ywrzDL3sVwebFo68sxtUzmQdjfREQIIrL+IGG58eG6S5aJv5dlYJpahHdLFA8OA80U/mXi5P7TZ6ZBDZ4C4tseGOw6h3MBblKZ7PfvW7OnFvWYleMWIK2CqHwK7lHHhnS+A2TCPdsiKBt0Ad0qR0lIaHGKFC/+xeRaSAWCSekEPstg4ouhImKERbUWAHeCiaIp9kejJ/Zq9zW800lCIXoTiraU9PTpA7KmEvowEYNICRTXwJ43a6GajcGjNZwgfjyCByeJGba2SS+4oawaZ6wgSPL1+21gtYP4nlfuxej4Y2K3BnsOhvs+psk9NgUGNGMcrBOj8LoTq20ar8dRjWh9qQPvdl6fmQFUmQRswpzHQ&lt;/CipherValue&gt; &lt;/CipherData&gt; &lt;/EncryptedData&gt; &lt;/connectionStrings&gt; 環境說明執行路徑aspnet_regiis.exe 位於 .NET Framework 安裝目錄中，預設路徑是： 32位元：%windir%\Microsoft.NET\Framework 64位元：%windir%\Microsoft.NET\Framework64 若覺得每次開啟 cmd.exe 再切換到上述目錄而感到不便，也可以直接使用 Visual Studio 的 Developer Command Prompt，開啟後即會將 .NET Framework 所在目錄加到 path 裡；在此也請記得使用 系統管理員 身份執行，以免無法順利成功加密 web.config 組態設定檔。 使用限制一般來說，我們在 web.config 組態設定裡比較常使用到的區段像是： &lt;appSettings&gt; 自訂參數的 key/value &lt;connectionStrings&gt; 連線字串 &lt;identity&gt; 模擬 IIS 提供 Windows 驗證 &lt;sessionState&gt; Session 儲存機制設定 上述區段都可以透過 aspnet_regiis.exe 將內容加密，而下列則是無法進行加密的區段： &lt;processModel&gt; &lt;runtime&gt; &lt;mscorlib&gt; &lt;startup&gt; &lt;system.runtime.remoting&gt; &lt;configProtectedData&gt; &lt;satelliteassemblies&gt; &lt;cryptographySettings&gt; &lt;cryptoNameMapping&gt; &lt;cryptoClasses&gt; 可以簡單理解為：程式執行階段相關必要設定與加密過後的區段無法再進行加密；此外，使用 aspnet_regiis.exe 進行加密時，可以指定組態設定檔所在目錄或是 IIS 應用程式集區名稱，但只會固定針對 web.config 這個檔案名稱做處理，且不會遞迴往下找尋所有子目錄，如果發現 web.config 檔案不存在，則會自動建立一個如下所示的 web.config 。 &lt;!--以加密 connectionStrings 為例，且 web.config 不存在--&gt; &lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt; &lt;configuration&gt; &lt;connectionStrings /&gt; &lt;/configuration&gt; aspnet_regiis.exe 提供了 RSA 與 DPAPI (Windows Data Protection API) 兩種加密方式，若執行時沒有特別指定 ProtectedConfigurationProvider，預設則會使用 RSA-2048 來做加密；且僅有 RSA 加密方式才能匯出加密金鑰，若想在多台伺服器使用同一組加密金鑰，也僅能選擇此方式。 (未完)]]></content>
+      <categories>
+        <category>.NET</category>
+      </categories>
+      <tags>
+        <tag>.NET</tag>
+        <tag>RSA</tag>
+        <tag>encrypt</tag>
+        <tag>decrypt</tag>
+        <tag>connection string</tag>
+        <tag>加密</tag>
+        <tag>解密</tag>
+        <tag>連線字串</tag>
+      </tags>
+  </entry>
 </search>

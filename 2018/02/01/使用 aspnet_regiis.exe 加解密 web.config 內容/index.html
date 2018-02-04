@@ -106,7 +106,7 @@
 <meta property="og:site_name" content=".NET 實戰演練">
 <meta property="og:description" content="aspnet_regiis.exe 主要用途是用來註冊 IIS 上的 ASP.NET 應用程式，像是：  註冊 -i 移除 -u .NET Framework ASP.NET 安裝 建立 ASP.NET 應用程式集區 列出目前已安裝的 ASP.NET 版本 -lv  除了這些以外，還能將組態設定 web.config 指定區段加解密。">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2018-02-04T07:48:55.920Z">
+<meta property="og:updated_time" content="2018-02-04T15:32:12.236Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="使用 aspnet_regiis.exe 加解密 web.config 內容">
 <meta name="twitter:description" content="aspnet_regiis.exe 主要用途是用來註冊 IIS 上的 ASP.NET 應用程式，像是：  註冊 -i 移除 -u .NET Framework ASP.NET 安裝 建立 ASP.NET 應用程式集區 列出目前已安裝的 ASP.NET 版本 -lv  除了這些以外，還能將組態設定 web.config 指定區段加解密。">
@@ -432,7 +432,7 @@
                   <span class="post-meta-item-text">Words count in article&#58;</span>
                 
                 <span title="Words count in article">
-                  717
+                  982
                 </span>
               
 
@@ -511,10 +511,16 @@
 <li>64位元：%windir%\Microsoft.NET\Framework64</li>
 </ul>
 <p>若覺得每次開啟 <code>cmd.exe</code> 再切換到上述目錄而感到不便，也可以直接使用 Visual Studio 的 Developer Command Prompt，開啟後即會將 .NET Framework 所在目錄加到 <code>path</code> 裡；在此也請記得使用 <code>系統管理員</code> 身份執行，以免無法順利成功加密 web.config 組態設定檔。</p>
-<h4 id="使用限制"><a href="#使用限制" class="headerlink" title="使用限制"></a>使用限制</h4><p>一般來說，我們在 <code>web.config</code> 組態設定裡比較常使用下列這些區段，且可進行加密：</p>
-<p>在使用 <code>aspnet_regiis.exe</code> 加密組態設定檔時，無法加密下列區段：</p>
+<h4 id="使用限制"><a href="#使用限制" class="headerlink" title="使用限制"></a>使用限制</h4><p>一般來說，我們在 <code>web.config</code> 組態設定裡比較常使用到的區段像是：</p>
 <ul>
-<li>< processModel ></li>
+<li><code>&lt;appSettings&gt;</code> 自訂參數的 key/value</li>
+<li><code>&lt;connectionStrings&gt;</code> 連線字串</li>
+<li><code>&lt;identity&gt;</code> 模擬 IIS 提供 Windows 驗證</li>
+<li><code>&lt;sessionState&gt;</code> Session 儲存機制設定</li>
+</ul>
+<p>上述區段都可以透過 <code>aspnet_regiis.exe</code> 將內容加密，而下列則是無法進行加密的區段：</p>
+<ul>
+<li><code>&lt;processModel&gt;</code></li>
 <li><code>&lt;runtime&gt;</code></li>
 <li><code>&lt;mscorlib&gt;</code></li>
 <li><code>&lt;startup&gt;</code></li>
@@ -525,6 +531,14 @@
 <li><code>&lt;cryptoNameMapping&gt;</code></li>
 <li><code>&lt;cryptoClasses&gt;</code></li>
 </ul>
+<p>可以簡單理解為：程式執行階段相關必要設定與加密過後的區段無法再進行加密；此外，使用 <code>aspnet_regiis.exe</code> 進行加密時，可以指定組態設定檔所在目錄或是 IIS 應用程式集區名稱，但只會固定針對 <code>web.config</code> 這個檔案名稱做處理，且不會遞迴往下找尋所有子目錄，如果發現 <code>web.config</code> 檔案不存在，則會自動建立一個如下所示的 <code>web.config</code> 。</p>
+<pre><code class="xml">&lt;!--以加密 connectionStrings 為例，且 web.config 不存在--&gt;
+&lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&gt;
+&lt;configuration&gt;
+    &lt;connectionStrings /&gt;
+&lt;/configuration&gt;
+</code></pre>
+<p><code>aspnet_regiis.exe</code> 提供了 RSA 與 DPAPI (Windows Data Protection API) 兩種加密方式，若執行時沒有特別指定 ProtectedConfigurationProvider，預設則會使用 RSA-2048 來做加密；且<span class="label danger">僅有 RSA 加密方式才能匯出加密金鑰</span>，若想在多台伺服器使用同一組加密金鑰，也僅能選擇此方式。 </p>
 <p>(未完)</p>
 
       
