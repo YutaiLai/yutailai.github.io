@@ -4,7 +4,7 @@
     
     <entry>
       <title><![CDATA[使用 aspnet_regiis.exe 加解密 web.config 組態設定檔]]></title>
-      <url>/2018/02/01/%E4%BD%BF%E7%94%A8%20aspnet_regiis.exe%20%E5%8A%A0%E8%A7%A3%E5%AF%86%20web.config%20%E5%85%A7%E5%AE%B9/</url>
+      <url>/2018/02/01/%E4%BD%BF%E7%94%A8%20aspnet_regiis.exe%20%E5%8A%A0%E8%A7%A3%E5%AF%86%20web.config%20%E7%B5%84%E6%85%8B%E8%A8%AD%E5%AE%9A%E6%AA%94/</url>
       <content type="html"><![CDATA[<p><code>aspnet_regiis.exe</code> 主要用途是用來註冊 IIS 上的 ASP.NET 應用程式，像是：</p>
 <ol>
 <li>註冊 <code>-i</code> 移除 <code>-u</code> .NET Framework ASP.NET 安裝</li>
@@ -203,6 +203,7 @@ aspnet_regiis &gt; C:\aspnet_regiis.txt
 <li><a href="https://blog.miniasp.com/post/2009/09/09/Introduce-IIS-75-Application-Pool-Identity-and-Virtual-Account.aspx" target="_blank" rel="noopener">介紹 IIS 7.5 的應用程式集區與新增的「虛擬帳戶」特性</a></li>
 <li><a href="https://case.ntu.edu.tw/blog/?p=29107" target="_blank" rel="noopener">RSA加密法遇上量子電腦</a></li>
 </ul>
+<hr>
 ]]></content>
       
         <categories>
@@ -222,7 +223,7 @@ aspnet_regiis &gt; C:\aspnet_regiis.txt
             
             <tag> connection string </tag>
             
-            <tag> aspnet_regiis </tag>
+            <tag> aspnet_regiis.exe </tag>
             
             <tag> 加密 </tag>
             
