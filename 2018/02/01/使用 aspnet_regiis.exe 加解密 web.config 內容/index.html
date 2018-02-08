@@ -101,7 +101,7 @@
 <meta name="description" content="aspnet_regiis.exe 主要用途是用來註冊 IIS 上的 ASP.NET 應用程式，像是：  註冊 -i 移除 -u .NET Framework ASP.NET 安裝 建立 ASP.NET 應用程式集區 列出目前已安裝的 ASP.NET 版本 -lv  除了這些以外，還能將組態設定檔 web.config 指定區段加解密。">
 <meta name="keywords" content="RSA,encrypt,decrypt,connection string,aspnet_regiis,加密,解密,連線字串">
 <meta property="og:type" content="article">
-<meta property="og:title" content="使用 aspnet_regiis.exe 加解密 web.config 內容">
+<meta property="og:title" content="使用 aspnet_regiis.exe 加解密 web.config 組態設定檔">
 <meta property="og:url" content="http://timlai.tw/2018/02/01/使用 aspnet_regiis.exe 加解密 web.config 內容/index.html">
 <meta property="og:site_name" content=".NET 實戰演練">
 <meta property="og:description" content="aspnet_regiis.exe 主要用途是用來註冊 IIS 上的 ASP.NET 應用程式，像是：  註冊 -i 移除 -u .NET Framework ASP.NET 安裝 建立 ASP.NET 應用程式集區 列出目前已安裝的 ASP.NET 版本 -lv  除了這些以外，還能將組態設定檔 web.config 指定區段加解密。">
@@ -112,9 +112,12 @@
 <meta property="og:image" content="http://timlai.tw/2018/02/01/使用%20aspnet_regiis.exe%20加解密%20web.config%20內容/IIS.png">
 <meta property="og:image" content="http://timlai.tw/2018/02/01/使用%20aspnet_regiis.exe%20加解密%20web.config%20內容/configProtectedData.png">
 <meta property="og:image" content="http://timlai.tw/2018/02/01/使用%20aspnet_regiis.exe%20加解密%20web.config%20內容/Identity.png">
-<meta property="og:updated_time" content="2018-02-08T06:01:57.226Z">
+<meta property="og:image" content="http://timlai.tw/2018/02/01/使用%20aspnet_regiis.exe%20加解密%20web.config%20內容/DataAccess.png">
+<meta property="og:image" content="http://timlai.tw/2018/02/01/使用%20aspnet_regiis.exe%20加解密%20web.config%20內容/Machine.png">
+<meta property="og:image" content="http://timlai.tw/2018/02/01/使用%20aspnet_regiis.exe%20加解密%20web.config%20內容/Config.png">
+<meta property="og:updated_time" content="2018-02-08T08:28:44.973Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="使用 aspnet_regiis.exe 加解密 web.config 內容">
+<meta name="twitter:title" content="使用 aspnet_regiis.exe 加解密 web.config 組態設定檔">
 <meta name="twitter:description" content="aspnet_regiis.exe 主要用途是用來註冊 IIS 上的 ASP.NET 應用程式，像是：  註冊 -i 移除 -u .NET Framework ASP.NET 安裝 建立 ASP.NET 應用程式集區 列出目前已安裝的 ASP.NET 版本 -lv  除了這些以外，還能將組態設定檔 web.config 指定區段加解密。">
 <meta name="twitter:image" content="http://timlai.tw/2018/02/01/使用%20aspnet_regiis.exe%20加解密%20web.config%20內容/MyWeb.png">
 
@@ -152,7 +155,7 @@
 
 
 
-  <title>使用 aspnet_regiis.exe 加解密 web.config 內容 | .NET 實戰演練</title>
+  <title>使用 aspnet_regiis.exe 加解密 web.config 組態設定檔 | .NET 實戰演練</title>
   
 
 
@@ -351,7 +354,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">使用 aspnet_regiis.exe 加解密 web.config 內容</h1>
+          <h1 class="post-title" itemprop="name headline">使用 aspnet_regiis.exe 加解密 web.config 組態設定檔</h1>
         
 
         <div class="post-meta">
@@ -414,7 +417,7 @@
 
           
           
-             <span id="/2018/02/01/使用 aspnet_regiis.exe 加解密 web.config 內容/" class="leancloud_visitors" data-flag-title="使用 aspnet_regiis.exe 加解密 web.config 內容">
+             <span id="/2018/02/01/使用 aspnet_regiis.exe 加解密 web.config 內容/" class="leancloud_visitors" data-flag-title="使用 aspnet_regiis.exe 加解密 web.config 組態設定檔">
                <span class="post-meta-divider">|</span>
                <span class="post-meta-item-icon">
                  <i class="fa fa-eye"></i>
@@ -439,7 +442,7 @@
                   <span class="post-meta-item-text">Words count in article&#58;</span>
                 
                 <span title="Words count in article">
-                  2,795
+                  3,537
                 </span>
               
 
@@ -547,13 +550,13 @@
 </code></pre>
 <p><code>aspnet_regiis.exe</code> 提供了 RSA 與 DPAPI (Windows Data Protection API) 兩種加密方式，若執行時沒有特別指定加密提供者 (ProtectedConfigurationProvider)，預設則會使用 <span class="label warning">RSA-1024</span> 來做加密；<strong>且僅有 RSA 加密方式才能匯出加密金鑰</strong>，若想在多台伺服器使用同一組加密金鑰，也僅能選擇此方式，接下來的說明也將以 RSA 加密為例。</p>
 <h4 id="加密層級"><a href="#加密層級" class="headerlink" title="加密層級"></a>加密層級</h4><p>RSAProtectedConfigurationProvider 提供了兩種金鑰容器 (Key Container)，我們可視實務上應用程式架構與資料敏感程度 (例：不同應用程式之間是否可共用同一組金鑰) 來決定採用何者：</p>
-<h5 id="電腦層級-Machine-level"><a href="#電腦層級-Machine-level" class="headerlink" title="電腦層級 (Machine-level)"></a>電腦層級 (Machine-level)</h5><p>預設所有可登入電腦的使用者都可以存取電腦層級的 RSA 金鑰容器，但我們也可透過引數 <code>-pa</code> 來指定  NTFS 存取控制清單 (ACL)，若希望在同一台伺服器上的所有應用程式集區都共用同一組加密金鑰，則適合選擇此方式，而所有電腦層級的 RSA 金鑰都會儲存在：</p>
+<h5 id="電腦層級-Machine-level"><a href="#電腦層級-Machine-level" class="headerlink" title="電腦層級 (Machine-level)"></a>電腦層級 (Machine-level)</h5><p>預設所有可登入電腦的使用者都可以存取電腦層級的 RSA 金鑰容器，但我們也可透過選項 <code>-pa</code> 來指定  NTFS 存取控制清單 (ACL)，若希望在同一台伺服器上的所有應用程式集區都共用同一組加密金鑰，則適合選擇此方式，而所有電腦層級的 RSA 金鑰都會儲存在：</p>
 <pre><code class="bash">\Documents and Settings\All Users\Application Data\Microsoft\Crypto\RSA\MachineKeys
 </code></pre>
 <h5 id="使用者層級-User-level"><a href="#使用者層級-User-level" class="headerlink" title="使用者層級 (User-level)"></a>使用者層級 (User-level)</h5><p>使用者層級的 RSA 金鑰容器和使用者設定檔 (User Profile) 是一起儲存的，若僅想在特定的使用者帳戶下執行加密與解密，則適合選擇此方式，而當使用者設定檔被刪除時，RSA 金鑰也會一併被移除，因為金鑰的存放路徑位於使用者帳戶之下：</p>
 <pre><code class="bash">\Documents and Settings\{使用者名稱}\Application Data\Microsoft\Crypto\RSA
 </code></pre>
-<h3 id="實作說明"><a href="#實作說明" class="headerlink" title="實作說明"></a>實作說明</h3><h4 id="指定組態設定檔目錄"><a href="#指定組態設定檔目錄" class="headerlink" title="指定組態設定檔目錄"></a>指定組態設定檔目錄</h4><p>指定 web.config 組態設定檔所在目錄，採用 RSA 電腦層級加密其指定區段內容，可以透過引數 <code>-pef</code> 加密 <code>-pdf</code> 解密：</p>
+<h3 id="實作說明"><a href="#實作說明" class="headerlink" title="實作說明"></a>實作說明</h3><h4 id="指定組態設定檔目錄"><a href="#指定組態設定檔目錄" class="headerlink" title="指定組態設定檔目錄"></a>指定組態設定檔目錄</h4><p>指定 web.config 組態設定檔所在目錄，採用 RSA 電腦層級加密其指定區段內容，可以透過選項 <code>-pef</code> 加密 <code>-pdf</code> 解密：</p>
 <pre><code class="bash">#對象：D:\MyWeb\api\web.config 裡的 &lt;connectionStrings&gt; 區段
 #加密
 aspnet_regiis -pef &quot;connectionStrings&quot; &quot;D:\MyWeb\api&quot;
@@ -618,7 +621,7 @@ aspnet_regiis -pc &quot;MyKey&quot; -exp
 ##刪除 MyKey 金鑰容器 
 aspnet_regiis -pz &quot;MyKey&quot;
 </code></pre>
-<h4 id="匯出-匯入金鑰容器"><a href="#匯出-匯入金鑰容器" class="headerlink" title="匯出/匯入金鑰容器"></a>匯出/匯入金鑰容器</h4><p>使用 <code>-px</code> 可將指定的金鑰容器匯出，通常我們會再加上 <code>-pri</code> 表示匯出時要包含私有金鑰，以便能夠進行加密與解密，若缺少了私有金鑰，僅能將資料加密無法解密，而匯出金鑰容器則是使用 <code>-pi</code> 引數。</p>
+<h4 id="匯出-匯入金鑰容器"><a href="#匯出-匯入金鑰容器" class="headerlink" title="匯出/匯入金鑰容器"></a>匯出/匯入金鑰容器</h4><p>使用 <code>-px</code> 可將指定的金鑰容器匯出，通常我們會再加上 <code>-pri</code> 表示匯出時要包含私有金鑰，以便能夠進行加密與解密，若缺少了私有金鑰，僅能將資料加密無法解密，而匯出金鑰容器則是使用 <code>-pi</code> 選項。</p>
 <pre><code class="bash">#匯出 MyKey 金鑰容器
 aspnet_regiis -px &quot;MyKey&quot; &quot;C:\MyKey.xml&quot; -pri
 #匯入 MyKey 金鑰容器
@@ -635,7 +638,33 @@ aspnet_regiis -pr &quot;MyKey&quot;
 <h4 id="讀取權限不足"><a href="#讀取權限不足" class="headerlink" title="讀取權限不足"></a>讀取權限不足</h4><p>經加密過的組態設定檔，在程式執行階段不需要再自行解密將原始本文取出，系統會自動以目前執行身份進行解密的動作，若無權限讀取當初加密的金鑰容器，則會發生錯誤如下圖：<br><img src="IIS.png" alt="IIS.png"></p>
 <p>要新增金鑰容器讀取權限，我們必需知道金鑰容器名稱、程式執行身份，才有辦法正確執行授權指令，加密後的內容都會在區段上註記 <code>configProtectionProvider</code> 屬性，同一份檔案裡通常也都找得到 <code>&lt;configProtectedData&gt;</code> 區段，如下圖：<br><img src="configProtectedData.png" alt="configProtectedData"></p>
 <p>在 IIS 裡若沒有特別指定，通常執行應用程式的使用者都是虛擬帳戶： <code>IIS AppPool\應用程式集區名稱</code>，另外也可以打開工作管理員，查看 <code>w3wp.exe</code> 使用者名稱，這些都是可以確認應用程式執行身份的方法，有了這些資訊後，就可以透過 <a href="#新增-刪除存取權限">3.7</a> 的方式來新增金鑰容器的讀取權限。<br><img src="Identity.png" alt="Identity"> </p>
-<h3 id="小技巧"><a href="#小技巧" class="headerlink" title="小技巧"></a>小技巧</h3><h3 id="後記"><a href="#後記" class="headerlink" title="後記"></a>後記</h3><p>(未完)</p>
+<h3 id="其他技巧"><a href="#其他技巧" class="headerlink" title="其他技巧"></a>其他技巧</h3><h4 id="外部組態檔"><a href="#外部組態檔" class="headerlink" title="外部組態檔"></a>外部組態檔</h4><p>因應專案不同的需求，我們的 web.config 組態設定檔除了原本的必要設定外，還有可能包含了來自第三方元件的各種設定而使內容冗長，這時我們可透過 <code>configSource</code> 來將指定的區域內容存放到其他路徑；即使 <code>aspnet_regiis.exe</code> 只針對檔名 web.config 做動作，我們也可透過此設定方式來變通，進而加密位於不同檔案的區段內容。<br><img src="DataAccess.png" alt="DataAccess"> </p>
+<h4 id="匯出執行檔說明"><a href="#匯出執行檔說明" class="headerlink" title="匯出執行檔說明"></a>匯出執行檔說明</h4><p>通常在命令提示列能夠使用的 <code>.exe</code> 都會自帶說明資訊，一般來說通常會使用 <code>/h</code>、<code>/?</code> 或是 <code>-h</code> 之類的引數，也有些是執行時一定要加上引數才能正常運作，所以直接執行 <code>.exe</code> 時就會列出指令說明，像這次使用的 <code>aspnet_regiis.exe</code> 即是如此。<br>而顯示在命令提示內的所有執行過程或內容，都可以匯出至檔案中，我們必需透過 <code>&gt;</code> 來指定儲存路徑，例如：</p>
+<pre><code class="bash">#將指令執行結果儲存至指定路徑
+aspnet_regiis &gt; C:\aspnet_regiis.txt
+</code></pre>
+<h4 id="machine-config"><a href="#machine-config" class="headerlink" title="machine.config"></a>machine.config</h4><p>文中我們有提到 <code>aspnet_regiis.exe</code> 沒有指定任何設定時，預設會使用電腦層級的 RSA 加密方式，由於 .NET Framework 組態繼承的關係，這些設定資訊都可從 machine.config 裡找到，路徑位於： </p>
+<ul>
+<li>32位元：%windir%\Microsoft.NET\Framework\版本\Config\</li>
+<li>64位元：%windir%\Microsoft.NET\Framework64\版本\Config\</li>
+</ul>
+<p>預設的加密提供者、金鑰容器名稱、加密層級都可以在 machine.config 裡找到定義：<br><img src="Machine.png" alt="machine.config"></p>
+<p>在此附帶一提，Config 目錄中還有 machine.config.comments，其中記載了大部份的組態設定說明供開發人員參閱，而 machine.config.default 顧名思義是使用預設值的 machine.config 檔案，萬一 machine.config 不慎損毀或其他因素需要重建，則可以複製此檔案來做修改。<br><img src="Config.png" alt="Config.config"></p>
+<h3 id="後記"><a href="#後記" class="headerlink" title="後記"></a>後記</h3><p><code>aspnet_regiis.exe</code> 是 .NET Framework 提供開發人員在 IIS 註冊應用程式的指令工具，除了文中所提及的設定選項，也可自行透過 <a href="#匯出執行檔說明">5.1</a> 的方式匯出所有指令說明，或參閱 <a href="https://msdn.microsoft.com/zh-tw/library/k6h9cz8h.aspx" target="_blank" rel="noopener">ASP.NET IIS 註冊工具 (Aspnet_regiis.exe)</a>，但此文中關於 <code>-pc</code> 選項的說明提到：</p>
+<blockquote>
+<p>-size keySize 指定金鑰的大小。 預設值為 2048 個位元組。</p>
+</blockquote>
+<p>這邊指的應該是位元 (bit)，而不是位元組(bytes)，而不指定 <code>-size</code> 加密後的 <code>&lt;CipherValue&gt;</code> 內容看起來像是 RSA-1024 的結果，可能找時間再以程式實際撰寫測試看看是否真如 MSDN 所述採用 RSA-2048。</p>
+<h3 id="參考資訊"><a href="#參考資訊" class="headerlink" title="參考資訊"></a>參考資訊</h3><ul>
+<li><a href="https://msdn.microsoft.com/zh-tw/library/ms178685.aspx" target="_blank" rel="noopener">ASP.NET 組態檔階層架構和繼承</a></li>
+<li><a href="https://msdn.microsoft.com/zh-tw/library/k6h9cz8h.aspx" target="_blank" rel="noopener">ASP.NET IIS 註冊工具 (Aspnet_regiis.exe)</a></li>
+<li><a href="https://msdn.microsoft.com/zh-tw/library/k8x4ket8.aspx" target="_blank" rel="noopener">HOW TO：建立 Web.config 檔</a></li>
+<li><a href="https://msdn.microsoft.com/zh-tw/library/hh8x3tas.aspx" target="_blank" rel="noopener">受保護的組態的概觀</a></li>
+<li><a href="https://msdn.microsoft.com/en-us/library/ff650304.aspx" target="_blank" rel="noopener">How To: Encrypt Configuration Sections in ASP.NET 2.0 Using RSA</a></li>
+<li><a href="https://msdn.microsoft.com/en-us/library/ff647398.aspx" target="_blank" rel="noopener">How To: Encrypt Configuration Sections in ASP.NET 2.0 Using DPAPI</a></li>
+<li><a href="https://blog.miniasp.com/post/2009/09/09/Introduce-IIS-75-Application-Pool-Identity-and-Virtual-Account.aspx" target="_blank" rel="noopener">介紹 IIS 7.5 的應用程式集區與新增的「虛擬帳戶」特性</a></li>
+<li><a href="https://case.ntu.edu.tw/blog/?p=29107" target="_blank" rel="noopener">RSA加密法遇上量子電腦</a></li>
+</ul>
 
       
     </div>
@@ -859,7 +888,7 @@ aspnet_regiis -pr &quot;MyKey&quot;
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#環境說明"><span class="nav-number">2.</span> <span class="nav-text">環境說明</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#程式路徑"><span class="nav-number">2.1.</span> <span class="nav-text">程式路徑</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用限制"><span class="nav-number">2.2.</span> <span class="nav-text">使用限制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加密層級"><span class="nav-number">2.3.</span> <span class="nav-text">加密層級</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#電腦層級-Machine-level"><span class="nav-number">2.3.1.</span> <span class="nav-text">電腦層級 (Machine-level)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#使用者層級-User-level"><span class="nav-number">2.3.2.</span> <span class="nav-text">使用者層級 (User-level)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#實作說明"><span class="nav-number">3.</span> <span class="nav-text">實作說明</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#指定組態設定檔目錄"><span class="nav-number">3.1.</span> <span class="nav-text">指定組態設定檔目錄</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#指定應用程式集區"><span class="nav-number">3.2.</span> <span class="nav-text">指定應用程式集區</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#指定加密提供者"><span class="nav-number">3.3.</span> <span class="nav-text">指定加密提供者</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#指定使用者層級加密"><span class="nav-number">3.4.</span> <span class="nav-text">指定使用者層級加密</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#建立-刪除金鑰容器"><span class="nav-number">3.5.</span> <span class="nav-text">建立/刪除金鑰容器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#匯出-匯入金鑰容器"><span class="nav-number">3.6.</span> <span class="nav-text">匯出/匯入金鑰容器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#新增-刪除存取權限"><span class="nav-number">3.7.</span> <span class="nav-text">新增/刪除存取權限</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#錯誤排除"><span class="nav-number">4.</span> <span class="nav-text">錯誤排除</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#無法開啟組態設定檔"><span class="nav-number">4.1.</span> <span class="nav-text">無法開啟組態設定檔</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#找不到加密提供者"><span class="nav-number">4.2.</span> <span class="nav-text">找不到加密提供者</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#讀取權限不足"><span class="nav-number">4.3.</span> <span class="nav-text">讀取權限不足</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#小技巧"><span class="nav-number">5.</span> <span class="nav-text">小技巧</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#後記"><span class="nav-number">6.</span> <span class="nav-text">後記</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#環境說明"><span class="nav-number">2.</span> <span class="nav-text">環境說明</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#程式路徑"><span class="nav-number">2.1.</span> <span class="nav-text">程式路徑</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#使用限制"><span class="nav-number">2.2.</span> <span class="nav-text">使用限制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#加密層級"><span class="nav-number">2.3.</span> <span class="nav-text">加密層級</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#電腦層級-Machine-level"><span class="nav-number">2.3.1.</span> <span class="nav-text">電腦層級 (Machine-level)</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#使用者層級-User-level"><span class="nav-number">2.3.2.</span> <span class="nav-text">使用者層級 (User-level)</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#實作說明"><span class="nav-number">3.</span> <span class="nav-text">實作說明</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#指定組態設定檔目錄"><span class="nav-number">3.1.</span> <span class="nav-text">指定組態設定檔目錄</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#指定應用程式集區"><span class="nav-number">3.2.</span> <span class="nav-text">指定應用程式集區</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#指定加密提供者"><span class="nav-number">3.3.</span> <span class="nav-text">指定加密提供者</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#指定使用者層級加密"><span class="nav-number">3.4.</span> <span class="nav-text">指定使用者層級加密</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#建立-刪除金鑰容器"><span class="nav-number">3.5.</span> <span class="nav-text">建立/刪除金鑰容器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#匯出-匯入金鑰容器"><span class="nav-number">3.6.</span> <span class="nav-text">匯出/匯入金鑰容器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#新增-刪除存取權限"><span class="nav-number">3.7.</span> <span class="nav-text">新增/刪除存取權限</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#錯誤排除"><span class="nav-number">4.</span> <span class="nav-text">錯誤排除</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#無法開啟組態設定檔"><span class="nav-number">4.1.</span> <span class="nav-text">無法開啟組態設定檔</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#找不到加密提供者"><span class="nav-number">4.2.</span> <span class="nav-text">找不到加密提供者</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#讀取權限不足"><span class="nav-number">4.3.</span> <span class="nav-text">讀取權限不足</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他技巧"><span class="nav-number">5.</span> <span class="nav-text">其他技巧</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#外部組態檔"><span class="nav-number">5.1.</span> <span class="nav-text">外部組態檔</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#匯出執行檔說明"><span class="nav-number">5.2.</span> <span class="nav-text">匯出執行檔說明</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#machine-config"><span class="nav-number">5.3.</span> <span class="nav-text">machine.config</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#後記"><span class="nav-number">6.</span> <span class="nav-text">後記</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#參考資訊"><span class="nav-number">7.</span> <span class="nav-text">參考資訊</span></a></li></ol></div>
             
 
           </div>
@@ -1035,7 +1064,7 @@ $(document).ready(function(){
         var disqus_config = function () {
           this.page.url = 'http://timlai.tw/2018/02/01/使用 aspnet_regiis.exe 加解密 web.config 內容/';
           this.page.identifier = '2018/02/01/使用 aspnet_regiis.exe 加解密 web.config 內容/';
-          this.page.title = '使用 aspnet_regiis.exe 加解密 web.config 內容';
+          this.page.title = '使用 aspnet_regiis.exe 加解密 web.config 組態設定檔';
         };
         var d = document, s = d.createElement('script');
         s.src = 'https://yutailai.disqus.com/embed.js';
